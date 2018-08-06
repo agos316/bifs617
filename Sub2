@@ -1,3 +1,9 @@
+use strict;
+use warnings;
+
+my $string= 'ACTGTGACCATGAC'; #Test data
+print revcomp_strand($string); #Test sub call
+
 #Sub 2: Create a reverse complementary strand of DNA
 sub revcomp_strand{
     
