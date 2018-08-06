@@ -1,0 +1,19 @@
+#Sub 2: Create a reverse complementary strand of DNA
+sub revcomp_strand{
+    
+    #Create variable for DNA string input
+    my $forward = (@_);
+    
+    #Reverse the string
+    my $reverse = reverse($string);
+    
+    #Copy the reverse strand into the revcomp variable
+    my $revcomp= $reverse;
+    
+    #Create the complementary strand
+    $revcomp =~ tr/ATGC/TACG/;
+    
+    #Return the new string
+    return $revcomp;
+    
+}
