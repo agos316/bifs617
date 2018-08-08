@@ -4,7 +4,7 @@ use warnings;
 my $string= 'ACTGTGACCATGAC'; #Test data
 print revcomp_strand($string); #Test sub call
 
-#Sub 2: Create a reverse complementary strand of DNA
+#Sub 2: Create a reverse complementary strand of DNA - Author: Courtney Kelley
 sub revcomp_strand{
     
     #Create variable for DNA string input
