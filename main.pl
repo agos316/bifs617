@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-my $string= 'ACTGTGACCATGAC'; #Test data
-print revcomp_strand($string); #Test sub call
-
 #Sub 1: Read and extract FASTA from file - Author: Marcus Agostinelli
+## Comment from Erick: read file and return an array with the contents of the file.
+## Then pass the output from read_fasta into extract_fasta.
+## extract_fasta returns a string with the sequence in FASTA format.
 sub read_fasta {
   my($file)=@_;
   my @fasta_data=();
@@ -35,16 +35,19 @@ sub extract_fasta {
 }
 
 #Sub 2: Create a reverse complementary strand of DNA - Author: Courtney Kelley
+## Comment from Erick: Take output from extract_fasta and pass it to revcomp_strand.
+## This will provide us the reverse complement of the sequence in addition to the sequence.
 sub revcomp_strand{
 
     #Create variable for DNA string input
-    my $forward = (@_);
+    ## Comment from Erick: Modifying to read string.
+    my $forward = $_[0];
 
     #Reverse the string
-    my $reverse = reverse($string);
+    my $reverse = reverse($forward);
 
     #Copy the reverse strand into the revcomp variable
-    my $revcomp= $reverse;
+    my $revcomp = $reverse;
 
     #Create the complementary strand
     $revcomp =~ tr/ATGC/TACG/;
@@ -55,6 +58,12 @@ sub revcomp_strand{
 }
 # Sub4
 # Primary author: Roy Carambula
+## Comment from Erick: Once we have the sequence and the reverse complement of the sequence,
+## we pass the sequence to the findORF subroutine. This will give us the start and stop positions of the ORF.
+
+# PseudoCode/strategy
+# Convert string to array, look for START (ATG) and STOP codons (TAA, TAG, TGA)
+# NOTES: need to test and address exceptions if any,
 sub findORF { #change to better name
     my @seq = @_;
     my @results = ();
@@ -85,23 +94,31 @@ sub findORF { #change to better name
     return(@results); # return array pairs of start, stop position values
 } # End Sub4
 
+## Main program execution - Author: Erick Galinkin
+my $infile;
+if (@ARGV) {
+  $infile = $ARGV[0];
+  print "Reading data from $infile...\n";
+} else {
+  print "Usage: orfs.pl <input_file>\n";
+  exit;
+}
 
-# File: Sub4-v1.pl
-$|=1; #buffer off
-
-# PseudoCode/strategy
-# Convert string to array, look for START (ATG) and STOP codons (TAA, TAG, TGA)
-# NOTES: need to test and address exceptions if any,
+my @data = read_fasta($infile);
+my $sequenceData = extract_fasta(@data);
+my $revcompSeq = revcomp_strand($sequenceData);
+#Program works up to this point.
+exit;
 
 # Main to test Sub4
 # Here we can do this x6 for each frame or call a new Sub
 my $testFrame1 = "ATGTATTAAATGTGAGGCCCATGATCATAACATAACTGTGTATGTCTTAGAGGACCAAACCCCCCTCCTTCC"; #this comes as input from elsewher
 my @tF1 = split ('', $testFrame1);
 
-my @resultFrame1 = sub4(@tF1); # call Sub4
+my @resultFrame1 = findORF(@tF1); # call Sub4
 my $numberOfORFsF1 = (scalar(@resultFrame1)/2);
 
-my $minORFLenght = 50; # min ORF lenght, Note: this is not yet in use, can be calculate while (Stop - Start position > $minORFLenght)
+my $minORFLength = 50; # min ORF lenght, Note: this is not yet in use, can be calculate while (Stop - Start position > $minORFLenght)
 # Reformat results as needed
 
 print "Number of ORFs: ".$numberOfORFsF1."\n";
