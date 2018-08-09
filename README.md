@@ -4,12 +4,14 @@ Group project
 
 use strict;
 use warnings;
-
+print("Enter the file name\n");
+my $input=<STDIN>;
+chomp($input);
 my @data=();
 my $dna='';
 
 #enter in the file name within the quotes 
-@data=read_fasta("");
+@data=read_fasta($input);
 
 $dna=extract_fasta(@data);
 
