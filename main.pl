@@ -56,6 +56,36 @@ sub revcomp_strand{
     return $revcomp;
 
 }
+
+# Sub 3 - Author: Erick Galinkin
+# Take in a string and return an array with the appropriate 3-gram.
+sub convert3Gram {
+  my $input = $_[0];
+  my $frame = $_[1];
+  my @seq = ();
+  for (my $i=($frame-1); $i<length($input)-3; $i+=3){
+    my $threeGram = substr($input, $i, 3);
+    push @seq, $threeGram;
+  }
+  return @seq
+}
+
+# Printresults sub - Author: Erick Galinkin
+# Cleanly print results from the frames.
+sub printresults {
+  my @frame = @{$_[0]};
+  my $frameID = $_[1];
+  my $numberofORFs = (scalar(@frame)/2);
+  print "$numberofORFs ORFs found in $frameID\n";
+  for(my $i=0; $i < ($numberofORFs*2); $i++){
+    my $start = $frame[$i];
+    $i++;
+    my $stop = $frame[$i];
+    print "Start: $start     Stop: $stop\n";
+  }
+  print "\n";
+}
+
 # Sub4
 # Primary author: Roy Carambula
 ## Comment from Erick: Once we have the sequence and the reverse complement of the sequence,
@@ -65,34 +95,31 @@ sub revcomp_strand{
 # Convert string to array, look for START (ATG) and STOP codons (TAA, TAG, TGA)
 # NOTES: need to test and address exceptions if any,
 sub findORF { #change to better name
-    ## Comment from Erick: Integrating my sub (which is just 2 lines) into this so we can avoid complex
-    ## refs. Takes input as a string per output from Courtney and Marcus's subs and converts it to an array.
-    my $input = $_[0]
-    my @seq = split ('', $input);
+    ## Comment from Erick: Integrating my sub into this so we can avoid complex array references.
+    ## Takes input as a string per output from Courtney and Marcus's subs and converts it to an array.
+    ## Adding ability to put in Frame number.
+    my $input = $_[0];
+    my @seq = convert3Gram($input, $_[1]);
     my @results = ();
     my $len = scalar(@seq);
     my $hits = 0; # tracks # of start stop position pairs
     my $i = 0;
     while ($i < $len) { # Find start ATG
-        if (($seq[$i] eq 'A') && ($seq[$i+1] eq 'T') && ($seq[$i+2] eq 'G')) {
+        if ($seq[$i] eq 'ATG') {
             my $start = $i + 1;
-            print "Start position is $start\n"; #will be removed
-            my $j = $i + 3;
+            my $j = $i + 1;
             while ($j < $len) { # Find stop  (TAA, TAG, TGA)
-                if ((($seq[$j] eq 'T') && ($seq[$j+1] eq 'A') && ($seq[$j+2] eq 'A'))
-                 || (($seq[$j] eq 'T') && ($seq[$j+1] eq 'A') && ($seq[$j+2] eq 'G'))
-                 || (($seq[$j] eq 'T') && ($seq[$j+1] eq 'G') && ($seq[$j+2] eq 'A'))) {
-                    my $stop = $j + 1;
+                if (($seq[$j] eq 'TAA') || ($seq[$j] eq 'TAG') || ($seq[$j] eq 'TGA')) {
+                    my $stop = ($j * 3) + 1;
                     $results[$hits] = $start;
                     $results[$hits+1] = $stop;
-                    print "Stop position is $stop\n"; #will be removed
                     $hits = $hits + 2;
                     $j = $len;
                 }
-                $j = $j + 3;
+                $j = $j + 1;
                 }
         }
-        $i = $i + 3;
+        $i = $i + 1;
     }
     return(@results); # return array pairs of start, stop position values
 } # End Sub4
@@ -112,21 +139,19 @@ my $sequenceData = extract_fasta(@data);
 my $revcompSeq = revcomp_strand($sequenceData);
 #Program works up to this point.
 
+#6 reading frames.
+my @frame1 = findORF($sequenceData, 1);
+my @frame2 = findORF($sequenceData, 2);
+my @frame3 = findORF($sequenceData, 3);
+my @frameneg1 = findORF($revcompSeq, 1);
+my @frameneg2 = findORF($revcompSeq, 2);
+my @frameneg3 = findORF($revcompSeq, 3);
+
+printresults(\@frame1, "Frame +1");
+printresults(\@frame2, "Frame +2");
+printresults(\@frame3, "Frame +3");
+printresults(\@frameneg1, "Frame -1");
+printresults(\@frameneg2, "Frame -2");
+printresults(\@frameneg3, "Frame -3");
+
 exit;
-
-# Main to test Sub4
-# Here we can do this x6 for each frame or call a new Sub
-my $testFrame1 = "ATGTATTAAATGTGAGGCCCATGATCATAACATAACTGTGTATGTCTTAGAGGACCAAACCCCCCTCCTTCC"; #this comes as input from elsewher
-my @tF1 = split ('', $testFrame1);
-
-my @resultFrame1 = findORF(@tF1); # call Sub4
-my $numberOfORFsF1 = (scalar(@resultFrame1)/2);
-
-my $minORFLength = 50; # min ORF lenght, Note: this is not yet in use, can be calculate while (Stop - Start position > $minORFLenght)
-# Reformat results as needed
-
-print "Number of ORFs: ".$numberOfORFsF1."\n";
-print "Result array contents (Start/Stop position pairs): @resultFrame1\n";
-#Regenerate the sequences based on Start/Stop, e.g while i < $numberOfORFsF1, then use start stop pair in a for to construct sequence.
-
-exit; # end of main program
