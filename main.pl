@@ -65,7 +65,10 @@ sub revcomp_strand{
 # Convert string to array, look for START (ATG) and STOP codons (TAA, TAG, TGA)
 # NOTES: need to test and address exceptions if any,
 sub findORF { #change to better name
-    my @seq = @_;
+    ## Comment from Erick: Integrating my sub (which is just 2 lines) into this so we can avoid complex
+    ## refs. Takes input as a string per output from Courtney and Marcus's subs and converts it to an array.
+    my $input = $_[0]
+    my @seq = split ('', $input);
     my @results = ();
     my $len = scalar(@seq);
     my $hits = 0; # tracks # of start stop position pairs
@@ -108,6 +111,7 @@ my @data = read_fasta($infile);
 my $sequenceData = extract_fasta(@data);
 my $revcompSeq = revcomp_strand($sequenceData);
 #Program works up to this point.
+
 exit;
 
 # Main to test Sub4
