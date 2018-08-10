@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 #Sub 1: Read and extract FASTA from file - Author: Marcus Agostinelli
+##Used Beginning Perl for Bioinformatics by James D.Tisdall for reference
 ## Comment from Erick: read file and return an array with the contents of the file.
 ## Then pass the output from read_fasta into extract_fasta.
 ## extract_fasta returns a string with the sequence in FASTA format.
